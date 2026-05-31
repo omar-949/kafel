@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+:root {
+  /* Kafel Design System Colors */
+  --color-primary-green: #0A4D34;
+  --color-primary-green-dark: #063121;
+  --color-primary-green-light: #126b4a;
+  --color-primary-green-ultra-light: rgba(10, 77, 52, 0.05);
+
+  --color-accent-gold: #C5A880;
+  --color-accent-gold-light: #ebdcc8;
+  --color-accent-gold-dark: #9f825d;
+
+  --color-bg-cream: #FDEFDE;
+  --color-bg-cream-dark: #F3EBE0;
+  --color-bg-cream-light: #FDFBF8;
+
+  --color-text-dark: #0F221A;
+  --color-text-muted: #526A5E;
+  --color-text-light: #7E968A;
+}
+
+@theme {
+  /* Kafel Design System Colors */
+  --color-primary-green: #0A4D34;
+  --color-primary-green-dark: #063121;
+  --color-primary-green-light: #126b4a;
+  --color-primary-green-ultra-light: rgba(10, 77, 52, 0.05);
+
+  --color-accent-gold: #C5A880;
+  --color-accent-gold-light: #ebdcc8;
+  --color-accent-gold-dark: #9f825d;
+
+  --color-bg-cream: #FDEFDE;
+  --color-bg-cream-dark: #F3EBE0;
+  --color-bg-cream-light: #FDFBF8;
+
+  --color-text-dark: #0F221A;
+  --color-text-muted: #526A5E;
+  --color-text-light: #7E968A;
+
+  /* Custom Typography */
+  --font-sans: 'Cairo', 'Tajawal', system-ui, -apple-system, sans-serif;
+
+  /* Custom Shadows */
+  --shadow-premium: 0 30px 60px -15px rgba(10, 77, 52, 0.15), 0 12px 24px -12px rgba(10, 77, 52, 0.1);
+  --shadow-glow: 0 0 30px rgba(59, 255, 172, 0.4);
+  --shadow-gold: 0 0 20px rgba(197, 168, 128, 0.4);
+}
+
+/* Global Reset overrides */
+html {
+  scroll-behavior: smooth;
+  background-color: var(--color-bg-cream);
+  color: var(--color-text-dark);
+  direction: rtl;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100vh;
+  max-width: 100%;
+  overflow-x: hidden;
+}
