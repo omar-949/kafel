@@ -13,6 +13,7 @@ import LatestNews from './components/LatestNews';
 import ContactUs from './components/ContactUs';
 import Footer from './components/Footer';
 import CandidateDetailsPage from './components/CandidateDetailsPage';
+import NewsDetailsPage from './components/NewsDetailsPage';
 
 function Home() {
   return (
@@ -40,6 +41,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/cv/:id" element={<CandidateDetailsPage />} />
+        <Route path="/news/:id" element={<NewsDetailsPage />} />
       </Routes>
     </BrowserRouter>
   );

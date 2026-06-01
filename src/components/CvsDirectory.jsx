@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-
-import { allCandidates } from './candidatesData';
+import { candidatesAPI, skillsAPI, languagesAPI } from '../services/api';
+import Pagination from './Pagination';
 
 const countries = [
   { code: 'ALL', name: 'الكل', flag: '🌍' },
@@ -20,6 +20,7 @@ const countries = [
 
 const filterSections = [
   { id: 'skills', label: 'المهارات' },
+  { id: 'languages', label: 'اللغات' },
   { id: 'age', label: 'العمر' },
   { id: 'religion', label: 'الديانة' },
   { id: 'experience', label: 'الخبرة' },
@@ -219,20 +220,46 @@ function CvCard({ candidate, viewMode, onSelect }) {
 }
 
 // Accordion filter item
-function FilterAccordion({ label }) {
+function FilterAccordion({
+  label,
+  options = [],
+  selected = [],
+  onToggle,
+  loading = false,
+  searchPlaceholder = 'ابحث...',
+  emptyText = 'لا توجد خيارات',
+}) {
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+
+  const filteredOptions = useMemo(() => {
+    if (!query.trim()) return options;
+    const q = query.trim().toLowerCase();
+    return options.filter((o) => (o.name || '').toLowerCase().includes(q));
+  }, [options, query]);
+
+  const selectedCount = selected.length;
+
   return (
     <div className="border-b border-[#f3f4f6] last:border-0">
       <button
+        type="button"
         className="w-full flex items-center justify-between py-3 px-1 text-sm text-[#4a5565] font-medium hover:text-[#1a2b4a] transition-colors"
-        onClick={() => setOpen(o => !o)}
+        onClick={() => setOpen((o) => !o)}
       >
-        <span>{label}</span>
+        <span className="flex items-center gap-2">
+          {label}
+          {selectedCount > 0 && (
+            <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-[#00bc96] text-white text-[10px] font-bold">
+              {selectedCount}
+            </span>
+          )}
+        </span>
         <span className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>
           <ChevronDownIcon />
         </span>
       </button>
-      <AnimatePresence>
+      <AnimatePresence initial={false}>
         {open && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
@@ -241,13 +268,89 @@ function FilterAccordion({ label }) {
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="pb-3 px-1 text-xs text-[#99a1af]">خيارات {label}...</div>
+            <div className="pb-3 px-1 flex flex-col gap-2">
+              {options.length > 5 && (
+                <div className="relative">
+                  <span className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#99a1af]">
+                    <SearchIcon />
+                  </span>
+                  <input
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder={searchPlaceholder}
+                    className="w-full border border-[#e5e7eb] rounded-[8px] pr-8 pl-2 py-1.5 text-xs text-[#4a5565] placeholder-[#99a1af] focus:outline-none focus:border-[#00bc96] bg-[#f9fafb] transition-colors"
+                    dir="rtl"
+                  />
+                </div>
+              )}
+
+              <div className="max-h-[200px] overflow-y-auto flex flex-col gap-1 -mx-1 px-1">
+                {loading ? (
+                  <div className="flex items-center justify-center py-3">
+                    <div className="w-4 h-4 border-2 border-[#00bc96] border-t-transparent rounded-full animate-spin" />
+                  </div>
+                ) : filteredOptions.length === 0 ? (
+                  <p className="text-xs text-[#99a1af] py-2 text-center">{emptyText}</p>
+                ) : (
+                  filteredOptions.map((option) => {
+                    const checked = selected.includes(option.id);
+                    return (
+                      <label
+                        key={option.id}
+                        className={`flex items-center gap-2 px-2 py-1.5 rounded-[6px] cursor-pointer text-xs transition-colors ${
+                          checked
+                            ? 'bg-[#f0fdf9] text-[#1a2b4a]'
+                            : 'text-[#4a5565] hover:bg-[#f9fafb]'
+                        }`}
+                      >
+                        <span
+                          className={`w-3.5 h-3.5 rounded-[4px] border flex items-center justify-center shrink-0 transition-colors ${
+                            checked
+                              ? 'bg-[#00bc96] border-[#00bc96]'
+                              : 'border-[#d1d5db] bg-white'
+                          }`}
+                        >
+                          {checked && (
+                            <svg
+                              width="9"
+                              height="9"
+                              viewBox="0 0 10 10"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M1.5 5L4 7.5L8.5 2.5"
+                                stroke="white"
+                                strokeWidth="1.6"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          )}
+                        </span>
+                        <input
+                          type="checkbox"
+                          className="sr-only"
+                          checked={checked}
+                          onChange={() => onToggle(option.id)}
+                        />
+                        <span className="truncate">{option.name}</span>
+                      </label>
+                    );
+                  })
+                )}
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
     </div>
   );
 }
+
+// Build a compact list of page tokens like [1, '...', 4, 5, 6, '...', 12]
+// (helper moved to src/components/Pagination.jsx)
 
 export default function CvsDirectory() {
   const [activeCountry, setActiveCountry] = useState('ALL');
@@ -256,18 +359,128 @@ export default function CvsDirectory() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [candidates, setCandidates] = useState([]);
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    total_pages: 1,
+    total_items: 0,
+    items_per_page: CARDS_PER_PAGE,
+    has_next: false,
+    has_prev: false
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [skills, setSkills] = useState([]);
+  const [skillsLoading, setSkillsLoading] = useState(false);
+  const [languages, setLanguages] = useState([]);
+  const [languagesLoading, setLanguagesLoading] = useState(false);
+  const [selectedSkills, setSelectedSkills] = useState([]);
+  const [selectedLanguages, setSelectedLanguages] = useState([]);
   const navigate = useNavigate();
   const flagsRef = useRef(null);
 
-  const filtered = allCandidates.filter(c =>
-    (activeCountry === 'ALL' || c.countryCode === activeCountry)
-  );
+  // Fetch skills + languages once on mount
+  useEffect(() => {
+    let cancelled = false;
 
-  const totalPages = Math.ceil(filtered.length / CARDS_PER_PAGE);
-  const paginated = filtered.slice((currentPage - 1) * CARDS_PER_PAGE, currentPage * CARDS_PER_PAGE);
+    const loadFilterOptions = async () => {
+      setSkillsLoading(true);
+      setLanguagesLoading(true);
+      try {
+        const [skillsList, languagesList] = await Promise.all([
+          skillsAPI.getAllFlat().catch((err) => {
+            console.error('Error fetching skills:', err);
+            return [];
+          }),
+          languagesAPI.getAllFlat().catch((err) => {
+            console.error('Error fetching languages:', err);
+            return [];
+          }),
+        ]);
+
+        if (cancelled) return;
+        setSkills(skillsList);
+        setLanguages(languagesList);
+      } finally {
+        if (!cancelled) {
+          setSkillsLoading(false);
+          setLanguagesLoading(false);
+        }
+      }
+    };
+
+    loadFilterOptions();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const toggleId = (list, setter) => (id) => {
+    setter((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
+
+  const toggleSkill = toggleId(selectedSkills, setSelectedSkills);
+  const toggleLanguage = toggleId(selectedLanguages, setSelectedLanguages);
+
+  // Fetch candidates from API
+  useEffect(() => {
+    const fetchCandidates = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const params = {
+          page: currentPage,
+          limit: CARDS_PER_PAGE,
+          sort: 'id',
+          order: sortOrder,
+        };
+
+        // Add country filter if not "ALL"
+        if (activeCountry !== 'ALL') {
+          params.country = activeCountry;
+        }
+
+        // Add search query if exists
+        if (searchQuery.trim()) {
+          params.search = searchQuery.trim();
+        }
+
+        // Add skill filters
+        if (selectedSkills.length > 0) {
+          params.skill_id = selectedSkills.join(',');
+        }
+
+        // Add language filters
+        if (selectedLanguages.length > 0) {
+          params.language_id = selectedLanguages.join(',');
+        }
+
+        const response = await candidatesAPI.getAll(params);
+        
+        if (response.success) {
+          setCandidates(response.data.candidates);
+          setPagination(response.data.pagination);
+        } else {
+          setError('فشل في تحميل البيانات');
+        }
+      } catch (err) {
+        console.error('Error fetching candidates:', err);
+        setError('حدث خطأ في تحميل السير الذاتية');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCandidates();
+  }, [currentPage, activeCountry, sortOrder, searchQuery, selectedSkills, selectedLanguages]);
 
   // Reset page when filter changes
-  useEffect(() => { setCurrentPage(1); }, [activeCountry]);
+  useEffect(() => { 
+    if (currentPage !== 1) {
+      setCurrentPage(1); 
+    }
+  }, [activeCountry, searchQuery, selectedSkills, selectedLanguages]);
 
   const scrollFlags = (dir) => {
     if (flagsRef.current) {
@@ -401,7 +614,33 @@ export default function CvsDirectory() {
 
             {/* Cards Grid / List */}
             <AnimatePresence mode="wait">
-              {paginated.length > 0 ? (
+              {loading ? (
+                <motion.div
+                  key="loading"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="text-center py-16"
+                >
+                  <div className="inline-block w-12 h-12 border-4 border-[#00bc96] border-t-transparent rounded-full animate-spin"></div>
+                  <p className="text-[#4a5565] mt-4 font-medium">جاري التحميل...</p>
+                </motion.div>
+              ) : error ? (
+                <motion.div
+                  key="error"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-16 bg-red-50 rounded-[10px] border border-red-200"
+                >
+                  <p className="text-red-600 font-medium">{error}</p>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="mt-3 text-sm text-[#00bc96] font-semibold hover:underline"
+                  >
+                    إعادة المحاولة
+                  </button>
+                </motion.div>
+              ) : candidates.length > 0 ? (
                 <motion.div
                   key={`${activeCountry}-${currentPage}-${viewMode}`}
                   initial={{ opacity: 0 }}
@@ -413,7 +652,7 @@ export default function CvsDirectory() {
                     : 'flex flex-col gap-3'
                   }
                 >
-                  {paginated.map((candidate) => (
+                  {candidates.map((candidate) => (
                     <CvCard
                       key={candidate.id}
                       candidate={candidate}
@@ -431,7 +670,10 @@ export default function CvsDirectory() {
                 >
                   <p className="text-[#99a1af] font-medium">لا توجد سير ذاتية مطابقة</p>
                   <button
-                    onClick={() => setActiveCountry('ALL')}
+                    onClick={() => {
+                      setActiveCountry('ALL');
+                      setSearchQuery('');
+                    }}
                     className="mt-3 text-sm text-[#00bc96] font-semibold hover:underline"
                   >
                     عرض الكل
@@ -441,36 +683,14 @@ export default function CvsDirectory() {
             </AnimatePresence>
 
             {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 pt-2 pb-4">
-                <button
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="w-9 h-9 rounded-[8px] border border-[#e5e5e6] flex items-center justify-center hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-[#4a5565]"
-                >
-                  →
-                </button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-                  <button
-                    key={p}
-                    onClick={() => setCurrentPage(p)}
-                    className={`w-9 h-9 rounded-[8px] border text-sm font-semibold transition-all duration-200
-                      ${currentPage === p
-                        ? 'bg-[#00bc96] border-[#00bc96] text-white'
-                        : 'border-[#e5e5e6] text-[#4a5565] hover:bg-gray-50'
-                      }`}
-                  >
-                    {p}
-                  </button>
-                ))}
-                <button
-                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                  className="w-9 h-9 rounded-[8px] border border-[#e5e5e6] flex items-center justify-center hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-[#4a5565]"
-                >
-                  ←
-                </button>
-              </div>
+            {!loading && !error && pagination.total_pages > 1 && (
+              <Pagination
+                currentPage={pagination.current_page}
+                totalPages={pagination.total_pages}
+                onPageChange={setCurrentPage}
+                hasPrev={pagination.has_prev}
+                hasNext={pagination.has_next}
+              />
             )}
           </div>
 
@@ -504,13 +724,44 @@ export default function CvsDirectory() {
 
             {/* Filter Accordions */}
             <div className="flex flex-col">
-              {filterSections.map(section => (
-                <FilterAccordion key={section.id} label={section.label} />
-              ))}
+              {filterSections.map(section => {
+                if (section.id === 'skills') {
+                  return (
+                    <FilterAccordion
+                      key={section.id}
+                      label={section.label}
+                      options={skills}
+                      selected={selectedSkills}
+                      onToggle={toggleSkill}
+                      loading={skillsLoading}
+                      emptyText="لا توجد مهارات"
+                    />
+                  );
+                }
+                if (section.id === 'languages') {
+                  return (
+                    <FilterAccordion
+                      key={section.id}
+                      label={section.label}
+                      options={languages}
+                      selected={selectedLanguages}
+                      onToggle={toggleLanguage}
+                      loading={languagesLoading}
+                      emptyText="لا توجد لغات"
+                    />
+                  );
+                }
+                return <FilterAccordion key={section.id} label={section.label} />;
+              })}
             </div>
 
             {/* Search Button */}
-            <button className="w-full bg-[#00bc96] hover:bg-[#00a884] text-white font-bold text-sm py-3 rounded-[10px] flex items-center justify-center gap-2 transition-colors duration-200 mt-1">
+            <button 
+              onClick={() => {
+                setCurrentPage(1);
+              }}
+              className="w-full bg-[#00bc96] hover:bg-[#00a884] text-white font-bold text-sm py-3 rounded-[10px] flex items-center justify-center gap-2 transition-colors duration-200 mt-1"
+            >
               <SearchIcon2 />
               بحث
             </button>
@@ -572,14 +823,43 @@ export default function CvsDirectory() {
 
               {/* Filter Accordions */}
               <div className="flex flex-col flex-1">
-                {filterSections.map(section => (
-                  <FilterAccordion key={section.id} label={section.label} />
-                ))}
+                {filterSections.map(section => {
+                  if (section.id === 'skills') {
+                    return (
+                      <FilterAccordion
+                        key={section.id}
+                        label={section.label}
+                        options={skills}
+                        selected={selectedSkills}
+                        onToggle={toggleSkill}
+                        loading={skillsLoading}
+                        emptyText="لا توجد مهارات"
+                      />
+                    );
+                  }
+                  if (section.id === 'languages') {
+                    return (
+                      <FilterAccordion
+                        key={section.id}
+                        label={section.label}
+                        options={languages}
+                        selected={selectedLanguages}
+                        onToggle={toggleLanguage}
+                        loading={languagesLoading}
+                        emptyText="لا توجد لغات"
+                      />
+                    );
+                  }
+                  return <FilterAccordion key={section.id} label={section.label} />;
+                })}
               </div>
 
               {/* Search Button */}
               <button
-                onClick={() => setShowMobileFilters(false)}
+                onClick={() => {
+                  setCurrentPage(1);
+                  setShowMobileFilters(false);
+                }}
                 className="w-full bg-[#00bc96] hover:bg-[#00a884] text-white font-bold text-sm py-3 rounded-[10px] flex items-center justify-center gap-2 transition-colors duration-200"
               >
                 <SearchIcon2 />
