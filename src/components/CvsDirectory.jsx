@@ -33,64 +33,64 @@ const CARDS_PER_PAGE = 6;
 // Icons as SVG components
 const ShareIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="12" cy="2.5" r="1.5" stroke="#99a1af" strokeWidth="1.2"/>
-    <circle cx="12" cy="13.5" r="1.5" stroke="#99a1af" strokeWidth="1.2"/>
-    <circle cx="3" cy="8" r="1.5" stroke="#99a1af" strokeWidth="1.2"/>
-    <line x1="4.3" y1="7.1" x2="10.6" y2="3.4" stroke="#99a1af" strokeWidth="1.2"/>
-    <line x1="4.3" y1="8.9" x2="10.6" y2="12.6" stroke="#99a1af" strokeWidth="1.2"/>
+    <circle cx="12" cy="2.5" r="1.5" stroke="#99a1af" strokeWidth="1.2" />
+    <circle cx="12" cy="13.5" r="1.5" stroke="#99a1af" strokeWidth="1.2" />
+    <circle cx="3" cy="8" r="1.5" stroke="#99a1af" strokeWidth="1.2" />
+    <line x1="4.3" y1="7.1" x2="10.6" y2="3.4" stroke="#99a1af" strokeWidth="1.2" />
+    <line x1="4.3" y1="8.9" x2="10.6" y2="12.6" stroke="#99a1af" strokeWidth="1.2" />
   </svg>
 );
 
 const ArrowLeftIcon = () => (
   <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-    <path d="M6 2L3 5L6 8" stroke="#4a5565" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M6 2L3 5L6 8" stroke="#4a5565" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
 const ArrowRightIcon = () => (
   <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-    <path d="M4 2L7 5L4 8" stroke="#4a5565" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M4 2L7 5L4 8" stroke="#4a5565" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
 const ChevronDownIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-    <path d="M4 6L8 10L12 6" stroke="#4a5565" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M4 6L8 10L12 6" stroke="#4a5565" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
 const SearchIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-    <circle cx="7" cy="7" r="5" stroke="#99a1af" strokeWidth="1.5"/>
-    <path d="M11 11L14 14" stroke="#99a1af" strokeWidth="1.5" strokeLinecap="round"/>
+    <circle cx="7" cy="7" r="5" stroke="#99a1af" strokeWidth="1.5" />
+    <path d="M11 11L14 14" stroke="#99a1af" strokeWidth="1.5" strokeLinecap="round" />
   </svg>
 );
 
 const ListIcon = ({ active }) => (
   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-    <rect x="2" y="4" width="2" height="2" rx="1" fill={active ? '#fff' : '#4a5565'}/>
-    <rect x="2" y="9" width="2" height="2" rx="1" fill={active ? '#fff' : '#4a5565'}/>
-    <rect x="2" y="14" width="2" height="2" rx="1" fill={active ? '#fff' : '#4a5565'}/>
-    <rect x="6" y="4" width="12" height="2" rx="1" fill={active ? '#fff' : '#4a5565'}/>
-    <rect x="6" y="9" width="12" height="2" rx="1" fill={active ? '#fff' : '#4a5565'}/>
-    <rect x="6" y="14" width="12" height="2" rx="1" fill={active ? '#fff' : '#4a5565'}/>
+    <rect x="2" y="4" width="2" height="2" rx="1" fill={active ? '#fff' : '#4a5565'} />
+    <rect x="2" y="9" width="2" height="2" rx="1" fill={active ? '#fff' : '#4a5565'} />
+    <rect x="2" y="14" width="2" height="2" rx="1" fill={active ? '#fff' : '#4a5565'} />
+    <rect x="6" y="4" width="12" height="2" rx="1" fill={active ? '#fff' : '#4a5565'} />
+    <rect x="6" y="9" width="12" height="2" rx="1" fill={active ? '#fff' : '#4a5565'} />
+    <rect x="6" y="14" width="12" height="2" rx="1" fill={active ? '#fff' : '#4a5565'} />
   </svg>
 );
 
 const GridIcon = ({ active }) => (
   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-    <rect x="2" y="2" width="7" height="7" rx="1.5" fill={active ? '#fff' : '#4a5565'}/>
-    <rect x="11" y="2" width="7" height="7" rx="1.5" fill={active ? '#fff' : '#4a5565'}/>
-    <rect x="2" y="11" width="7" height="7" rx="1.5" fill={active ? '#fff' : '#4a5565'}/>
-    <rect x="11" y="11" width="7" height="7" rx="1.5" fill={active ? '#fff' : '#4a5565'}/>
+    <rect x="2" y="2" width="7" height="7" rx="1.5" fill={active ? '#fff' : '#4a5565'} />
+    <rect x="11" y="2" width="7" height="7" rx="1.5" fill={active ? '#fff' : '#4a5565'} />
+    <rect x="2" y="11" width="7" height="7" rx="1.5" fill={active ? '#fff' : '#4a5565'} />
+    <rect x="11" y="11" width="7" height="7" rx="1.5" fill={active ? '#fff' : '#4a5565'} />
   </svg>
 );
 
 const ExternalLinkIcon = () => (
   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-    <path d="M5.5 2.5H2.5C2 2.5 1.5 3 1.5 3.5V11.5C1.5 12 2 12.5 2.5 12.5H10.5C11 12.5 11.5 12 11.5 11.5V8.5" stroke="#1a2b4a" strokeWidth="1.2" strokeLinecap="round"/>
-    <path d="M7.5 1.5H12.5V6.5" stroke="#1a2b4a" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M12.5 1.5L6.5 7.5" stroke="#1a2b4a" strokeWidth="1.2" strokeLinecap="round"/>
+    <path d="M5.5 2.5H2.5C2 2.5 1.5 3 1.5 3.5V11.5C1.5 12 2 12.5 2.5 12.5H10.5C11 12.5 11.5 12 11.5 11.5V8.5" stroke="#1a2b4a" strokeWidth="1.2" strokeLinecap="round" />
+    <path d="M7.5 1.5H12.5V6.5" stroke="#1a2b4a" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M12.5 1.5L6.5 7.5" stroke="#1a2b4a" strokeWidth="1.2" strokeLinecap="round" />
   </svg>
 );
 
@@ -130,8 +130,8 @@ function CvCard({ candidate, viewMode, onSelect }) {
             <span className={`text-xs font-bold px-3 py-1 rounded-full ${isAvailable ? 'bg-[#dcfce7] text-[#008236]' : 'bg-[#ffedd4] text-[#ca3500]'}`}>
               {candidate.status}
             </span>
-            <button 
-              onClick={onSelect} 
+            <button
+              onClick={onSelect}
               className="text-sm font-medium text-[#1a2b4a] hover:text-[#00bc96] flex items-center gap-1 transition-colors cursor-pointer"
             >
               المزيد <ExternalLinkIcon />
@@ -276,7 +276,7 @@ export default function CvsDirectory() {
   };
 
   return (
-    <section id="cvs" className="py-16 bg-white overflow-hidden">
+    <section id="cvs" className="py-25 bg-white overflow-hidden">
       <div className="max-w-[1400px] mx-auto px-6">
 
         {/* Title */}
@@ -377,7 +377,7 @@ export default function CvsDirectory() {
                   title="البحث المتقدم"
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
                   </svg>
                 </button>
                 <button
@@ -414,11 +414,11 @@ export default function CvsDirectory() {
                   }
                 >
                   {paginated.map((candidate) => (
-                    <CvCard 
-                      key={candidate.id} 
-                      candidate={candidate} 
-                      viewMode={viewMode} 
-                      onSelect={() => navigate('/cv/' + candidate.id)} 
+                    <CvCard
+                      key={candidate.id}
+                      candidate={candidate}
+                      viewMode={viewMode}
+                      onSelect={() => navigate('/cv/' + candidate.id)}
                     />
                   ))}
                 </motion.div>
@@ -545,13 +545,13 @@ export default function CvsDirectory() {
                 <h3 className="text-base font-bold text-[#1a2b4a]">
                   بحث متقدم
                 </h3>
-                <button 
+                <button
                   onClick={() => setShowMobileFilters(false)}
                   className="text-gray-400 hover:text-gray-600 transition-colors p-1"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"/>
-                    <line x1="6" y1="6" x2="18" y2="18"/>
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
                   </svg>
                 </button>
               </div>
@@ -578,7 +578,7 @@ export default function CvsDirectory() {
               </div>
 
               {/* Search Button */}
-              <button 
+              <button
                 onClick={() => setShowMobileFilters(false)}
                 className="w-full bg-[#00bc96] hover:bg-[#00a884] text-white font-bold text-sm py-3 rounded-[10px] flex items-center justify-center gap-2 transition-colors duration-200"
               >
@@ -597,8 +597,8 @@ export default function CvsDirectory() {
 function SearchIcon2() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <circle cx="7" cy="7" r="5" stroke="white" strokeWidth="1.5"/>
-      <path d="M11 11L14 14" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+      <circle cx="7" cy="7" r="5" stroke="white" strokeWidth="1.5" />
+      <path d="M11 11L14 14" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   );
 }

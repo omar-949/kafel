@@ -7,6 +7,7 @@ import logoBadge from '../assets/navbar/logo2.png';
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState('');
   const location = useLocation();
 
   const isHomePage = location.pathname === '/';
@@ -22,13 +23,95 @@ export default function Navbar() {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
+  // Track active section based on scroll position
+  useEffect(() => {
+    if (!isHomePage) return;
+
+    const sections = [
+      { id: 'about', element: null },
+      { id: 'services', element: null },
+      { id: 'why-kafel', element: null },
+      { id: 'cvs', element: null },
+      { id: 'news', element: null },
+      { id: 'contact', element: null },
+    ];
+
+    // Get all section elements
+    sections.forEach(section => {
+      section.element = document.getElementById(section.id);
+    });
+
+    const handleScrollSpy = () => {
+      const scrollPosition = window.scrollY + window.innerHeight / 3;
+
+      // Check if we're at the top of the page
+      if (window.scrollY < 100) {
+        setActiveSection('');
+        return;
+      }
+
+      // Find which section is currently in view
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const section = sections[i];
+        if (section.element) {
+          const sectionTop = section.element.offsetTop;
+          if (scrollPosition >= sectionTop) {
+            setActiveSection(section.id);
+            return;
+          }
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScrollSpy);
+    handleScrollSpy(); // Call once on mount
+
+    return () => window.removeEventListener('scroll', handleScrollSpy);
+  }, [isHomePage]);
+
   const navLinks = [
-    { href: isHomePage ? '#'         : '/',          label: 'الرئيسية',       active: location.pathname === '/' },
-    { href: isHomePage ? '#services' : '/#services', label: 'خدماتنا' },
-    { href: isHomePage ? '#about'    : '/#about',    label: 'من نحن' },
-    { href: isHomePage ? '#news'     : '/#news',     label: 'آخر الأخبار' },
-    { href: isHomePage ? '#faq'      : '/#faq',      label: 'الأسئلة الشائعة' },
-    { href: isHomePage ? '#contact'  : '/#contact',  label: 'تواصل معنا' },
+    { 
+      href: isHomePage ? '#' : '/', 
+      label: 'الرئيسية', 
+      section: '',
+      active: location.pathname === '/' && activeSection === '' 
+    },
+    { 
+      href: isHomePage ? '#about' : '/#about', 
+      label: 'من نحن',
+      section: 'about',
+      active: activeSection === 'about'
+    },
+    { 
+      href: isHomePage ? '#services' : '/#services', 
+      label: 'خدماتنا',
+      section: 'services',
+      active: activeSection === 'services'
+    },
+    { 
+      href: isHomePage ? '#why-kafel' : '/#why-kafel', 
+      label: 'لماذا كافل ؟',
+      section: 'why-kafel',
+      active: activeSection === 'why-kafel'
+    },
+    { 
+      href: isHomePage ? '#cvs' : '/#cvs', 
+      label: 'السير الذاتية',
+      section: 'cvs',
+      active: activeSection === 'cvs'
+    },
+    { 
+      href: isHomePage ? '#news' : '/#news', 
+      label: 'آخر الأخبار',
+      section: 'news',
+      active: activeSection === 'news'
+    },
+    { 
+      href: isHomePage ? '#contact' : '/#contact', 
+      label: 'تواصل معنا',
+      section: 'contact',
+      active: activeSection === 'contact'
+    },
   ];
 
   return (
@@ -85,7 +168,7 @@ export default function Navbar() {
                     key={link.label}
                     className="relative group"
                     variants={{
-                      hidden:  { opacity: 0, y: -12 },
+                      hidden: { opacity: 0, y: -12 },
                       visible: { opacity: 1, y: 0, transition: { duration: 0.35 } },
                     }}
                   >

@@ -84,10 +84,10 @@ export default function Footer() {
             {/* App Store Download Badges under Support */}
             <div className="flex gap-3 mt-4 items-center">
               <a href="#" className="w-[120px] transition-transform hover:-translate-y-1 block duration-300">
-                <img src={appStoreBadge} alt="App Store download" className="w-full h-auto object-contain" />
+                <img src={appStoreBadge} alt="App Store download" className="bg-white w-full h-auto object-contain" />
               </a>
               <a href="#" className="w-[120px] transition-transform hover:-translate-y-1 block duration-300">
-                <img src={googlePlayBadge} alt="Google Play download" className="w-full h-auto object-contain" />
+                <img src={googlePlayBadge} alt="Google Play download" className="bg-white w-full h-auto object-contain" />
               </a>
             </div>
           </div>
