@@ -155,7 +155,7 @@ export default function CandidateDetailsPage() {
   const skills = Array.isArray(candidate.skills) ? candidate.skills : [];
   const languages = Array.isArray(candidate.languages) ? candidate.languages : [];
   const avatarSrc = candidate.avatar || FALLBACK_AVATAR;
-  const countryDisplay = candidate.country_code || candidate.country || '';
+  const countryDisplay = candidate.country || '';
 
   const personalRows = [
     { label: 'الاسم الكامل', val: candidate.name },
@@ -243,7 +243,6 @@ export default function CandidateDetailsPage() {
                 <div className="bg-white/10 backdrop-blur-sm rounded-[10px] py-3 px-4 flex flex-col gap-1 items-center md:items-start text-center md:text-right min-w-[120px]">
                   <span className="font-sans font-normal text-xs text-[#bedbff]">الجنسية</span>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="text-xl leading-none">{candidate.flag || '🌍'}</span>
                     <span className="font-sans font-bold text-sm text-white">{countryDisplay || '—'}</span>
                   </div>
                 </div>
@@ -367,30 +366,6 @@ export default function CandidateDetailsPage() {
               }}
             >
               حجز المرشحة
-            </button>
-
-            <button
-              onClick={handleDownloadPDF}
-              disabled={isGenerating}
-              className="w-full sm:w-[230px] h-[56px] bg-[#1a2b4a] hover:bg-[#253d6a] disabled:opacity-60 disabled:cursor-not-allowed text-white font-sans font-bold text-[15px] rounded-[12px] cursor-pointer transition-all duration-300 transform active:scale-95 text-center flex items-center justify-center gap-2.5 shadow-sm"
-            >
-              {isGenerating ? (
-                <>
-                  <svg className="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)" strokeWidth="3" />
-                    <path d="M12 2a10 10 0 0 1 10 10" stroke="white" strokeWidth="3" strokeLinecap="round" />
-                  </svg>
-                  <span>جاري الإنشاء...</span>
-                </>
-              ) : (
-                <>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="white" strokeWidth="2" strokeLinejoin="round" />
-                    <path d="M14 2v6h6M12 18v-6M9 15l3 3 3-3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  <span>تحميل PDF</span>
-                </>
-              )}
             </button>
           </div>
 

@@ -190,9 +190,61 @@ export const languagesAPI = {
   getAllFlat: () => fetchAllPages('/languages'),
 };
 
+/**
+ * Countries API
+ */
+export const countriesAPI = {
+  getAll: async (params = {}) => {
+    const queryParams = new URLSearchParams();
+    Object.keys(params).forEach((key) => {
+      if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+        queryParams.append(key, params[key]);
+      }
+    });
+    const queryString = queryParams.toString();
+    return apiRequest(`/countries${queryString ? `?${queryString}` : ''}`);
+  },
+  getAllFlat: () => fetchAllPages('/countries'),
+};
+
+/**
+ * Settings API
+ */
+export const settingsAPI = {
+  getAll: async () => apiRequest('/settings'),
+};
+
+// Simple module-level cache so multiple components don't refetch /settings
+let settingsCache = null;
+let settingsPromise = null;
+
+export function getSettings(force = false) {
+  if (force) {
+    settingsCache = null;
+    settingsPromise = null;
+  }
+  if (settingsCache) return Promise.resolve(settingsCache);
+  if (settingsPromise) return settingsPromise;
+
+  settingsPromise = settingsAPI
+    .getAll()
+    .then((response) => {
+      settingsCache = response?.data ?? null;
+      return settingsCache;
+    })
+    .catch((err) => {
+      settingsPromise = null;
+      throw err;
+    });
+
+  return settingsPromise;
+}
+
 export default {
   candidates: candidatesAPI,
   news: newsAPI,
   skills: skillsAPI,
   languages: languagesAPI,
+  countries: countriesAPI,
+  settings: settingsAPI,
 };

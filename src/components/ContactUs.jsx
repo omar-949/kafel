@@ -1,6 +1,20 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+const WHATSAPP_NUMBER = '966541599736';
+
+function buildWhatsAppMessage({ name, phone, message }) {
+  return [
+    'مرحباً، رسالة جديدة من موقع كافل:',
+    '',
+    `الاسم: ${name}`,
+    `رقم الهاتف: ${phone}`,
+    '',
+    'الرسالة:',
+    message,
+  ].join('\n');
+}
+
 export default function ContactUs() {
   const [formData, setFormData] = useState({
     name: '',
@@ -24,8 +38,12 @@ export default function ContactUs() {
       return;
     }
     setFormError('');
+
+    const text = buildWhatsAppMessage(formData);
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+
     setFormSubmitted(true);
-    // Reset form
     setFormData({
       name: '',
       phone: '',

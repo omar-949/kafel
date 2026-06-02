@@ -1,22 +1,31 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { candidatesAPI, skillsAPI, languagesAPI } from '../services/api';
+import { candidatesAPI, skillsAPI, languagesAPI, countriesAPI } from '../services/api';
 import Pagination from './Pagination';
 
-const countries = [
-  { code: 'ALL', name: 'الكل', flag: '🌍' },
-  { code: 'ID', name: 'إندونيسيا', flag: '🇮🇩' },
-  { code: 'LK', name: 'سريلانكا', flag: '🇱🇰' },
-  { code: 'PH', name: 'الفلبين', flag: '🇵🇭' },
-  { code: 'UG', name: 'أوغندا', flag: '🇺🇬' },
-  { code: 'KE', name: 'كينيا', flag: '🇰🇪' },
-  { code: 'ER', name: 'إريتريا', flag: '🇪🇷' },
-  { code: 'BD', name: 'بنغلاديش', flag: '🇧🇩' },
-  { code: 'PK', name: 'باكستان', flag: '🇵🇰' },
-  { code: 'BI', name: 'بوروندي', flag: '🇧🇮' },
-  { code: 'ET', name: 'إثيوبيا', flag: '🇪🇹' },
-];
+const ALL_COUNTRY = { code: 'ALL', name: 'الكل' };
+
+// Build a flag emoji from a 2-letter ISO country code (e.g. "KE" -> "🇰🇪")
+function codeToFlagEmoji(code) {
+  if (!code || typeof code !== 'string' || code.length !== 2) return '🌍';
+  const upper = code.toUpperCase();
+  const A = 0x41;
+  const regionalIndicatorA = 0x1f1e6;
+  return String.fromCodePoint(
+    regionalIndicatorA + (upper.charCodeAt(0) - A),
+    regionalIndicatorA + (upper.charCodeAt(1) - A)
+  );
+}
+
+// Resolve any image path coming from the API into a usable src.
+// Accepts: full URL (http/https), absolute path (/storage/...), relative path.
+function resolveImageSrc(image, apiBase) {
+  if (!image) return null;
+  if (/^https?:\/\//i.test(image)) return image;
+  if (image.startsWith('/')) return `${apiBase}${image}`;
+  return `${apiBase}/${image}`;
+}
 
 const filterSections = [
   { id: 'skills', label: 'المهارات' },
@@ -353,6 +362,10 @@ function FilterAccordion({
 // (helper moved to src/components/Pagination.jsx)
 
 export default function CvsDirectory() {
+  const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL?.replace(/\/api\/v\d+\/?$/, '') ||
+    'http://127.0.0.1:8000';
+
   const [activeCountry, setActiveCountry] = useState('ALL');
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
   const [sortOrder, setSortOrder] = useState('desc');
@@ -376,18 +389,21 @@ export default function CvsDirectory() {
   const [languagesLoading, setLanguagesLoading] = useState(false);
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [selectedLanguages, setSelectedLanguages] = useState([]);
+  const [countries, setCountries] = useState([]);
+  const [countriesLoading, setCountriesLoading] = useState(false);
   const navigate = useNavigate();
   const flagsRef = useRef(null);
 
-  // Fetch skills + languages once on mount
+  // Fetch skills + languages + countries once on mount
   useEffect(() => {
     let cancelled = false;
 
     const loadFilterOptions = async () => {
       setSkillsLoading(true);
       setLanguagesLoading(true);
+      setCountriesLoading(true);
       try {
-        const [skillsList, languagesList] = await Promise.all([
+        const [skillsList, languagesList, countriesList] = await Promise.all([
           skillsAPI.getAllFlat().catch((err) => {
             console.error('Error fetching skills:', err);
             return [];
@@ -396,15 +412,21 @@ export default function CvsDirectory() {
             console.error('Error fetching languages:', err);
             return [];
           }),
+          countriesAPI.getAllFlat().catch((err) => {
+            console.error('Error fetching countries:', err);
+            return [];
+          }),
         ]);
 
         if (cancelled) return;
         setSkills(skillsList);
         setLanguages(languagesList);
+        setCountries(countriesList);
       } finally {
         if (!cancelled) {
           setSkillsLoading(false);
           setLanguagesLoading(false);
+          setCountriesLoading(false);
         }
       }
     };
@@ -526,25 +548,71 @@ export default function CvsDirectory() {
             className="flex gap-3 overflow-x-auto scrollbar-hide flex-1 min-w-0"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {countries.map((c) => {
-              const isActive = activeCountry === c.code;
-              return (
-                <button
-                  key={c.code}
-                  onClick={() => setActiveCountry(c.code)}
-                  className={`shrink-0 flex flex-col items-center gap-2 p-3 rounded-[10px] w-[90px] transition-all duration-200 border
-                    ${isActive
-                      ? 'bg-[#f0fdf9] border-[#00bc96] shadow-sm'
-                      : 'bg-white border-transparent hover:bg-gray-50 hover:border-[#e5e5e6]'
-                    }`}
-                >
-                  <span className="text-3xl leading-none">{c.flag}</span>
-                  <span className={`text-xs font-medium leading-tight text-center ${isActive ? 'text-[#00bc96]' : 'text-[#364153]'}`}>
-                    {c.name}
-                  </span>
-                </button>
-              );
-            })}
+            {/* "All" pseudo-country stays first */}
+            <button
+              key={ALL_COUNTRY.code}
+              onClick={() => setActiveCountry(ALL_COUNTRY.code)}
+              className={`shrink-0 flex flex-col items-center gap-2 p-3 rounded-[10px] w-[90px] transition-all duration-200 border
+                ${activeCountry === ALL_COUNTRY.code
+                  ? 'bg-[#f0fdf9] border-[#00bc96] shadow-sm'
+                  : 'bg-white border-transparent hover:bg-gray-50 hover:border-[#e5e5e6]'
+                }`}
+            >
+              <span className="w-12 h-12 rounded-full bg-[#f3f4f6] flex items-center justify-center text-2xl leading-none">
+                🌍
+              </span>
+              <span className={`text-xs font-medium leading-tight text-center ${activeCountry === ALL_COUNTRY.code ? 'text-[#00bc96]' : 'text-[#364153]'}`}>
+                {ALL_COUNTRY.name}
+              </span>
+            </button>
+
+            {countriesLoading && countries.length === 0 ? (
+              <div className="flex items-center gap-2 px-3 py-2 text-xs text-[#99a1af] font-sans">
+                <div className="w-4 h-4 border-2 border-[#00bc96] border-t-transparent rounded-full animate-spin" />
+                جاري تحميل الدول...
+              </div>
+            ) : countries.length === 0 ? (
+              <p className="text-xs text-[#99a1af] font-sans px-2 py-3">
+                لا توجد دول متاحة
+              </p>
+            ) : (
+              countries.map((c) => {
+                const code = (c.code || '').toUpperCase();
+                const isActive = activeCountry === code;
+                const imageSrc = resolveImageSrc(c.image, API_BASE_URL);
+                return (
+                  <button
+                    key={c.id ?? code}
+                    onClick={() => setActiveCountry(code)}
+                    className={`shrink-0 flex flex-col items-center gap-2 p-3 rounded-[10px] w-[90px] transition-all duration-200 border
+                      ${isActive
+                        ? 'bg-[#f0fdf9] border-[#00bc96] shadow-sm'
+                        : 'bg-white border-transparent hover:bg-gray-50 hover:border-[#e5e5e6]'
+                      }`}
+                  >
+                    <span className="w-12 h-12 rounded-full overflow-hidden bg-[#f3f4f6] flex items-center justify-center">
+                      {imageSrc ? (
+                        <img
+                          src={imageSrc}
+                          alt={c.name}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.parentElement.textContent = codeToFlagEmoji(code);
+                          }}
+                        />
+                      ) : (
+                        <span className="text-2xl leading-none">{codeToFlagEmoji(code)}</span>
+                      )}
+                    </span>
+                    <span className={`text-xs font-medium leading-tight text-center ${isActive ? 'text-[#00bc96]' : 'text-[#364153]'}`}>
+                      {c.name}
+                    </span>
+                  </button>
+                );
+              })
+            )}
           </div>
 
           {/* Next Arrow */}
